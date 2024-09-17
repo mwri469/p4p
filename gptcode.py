@@ -6,6 +6,16 @@ from keras.models import Sequential
 from keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
 
+class Predictor:
+    def __init__(self, dataframe, predict_idx):
+        pass
+
+    def predict(self):
+        pass
+
+    def plot(self, time_step, title):
+        pass
+
 # Load your data
 df = pd.read_csv('fulldata.csv')
 
@@ -109,24 +119,25 @@ def show_plot(plot_data, delta, title):
     labels = ["History", "True Future", "Model Prediction"]
     marker = [".-", "rx", "go"]
     time_steps = list(range(-(plot_data[0].shape[0]), 0))
-    if delta:
-        future = delta
-    else:
-        future = 0
+    future_steps = list(range(delta))
 
     plt.title(title)
     for i, val in enumerate(plot_data):
-        if i:
-            plt.plot(future, plot_data[i], marker[i], markersize=10, label=labels[i])
+        if i == 1:  # True Future
+            plt.plot(future_steps, val, marker[i], markersize=10, label=labels[i])
+        elif i == 2:  # Model Prediction
+            plt.plot(future_steps, val, marker[i], markersize=10, label=labels[i])
         else:
-            plt.plot(time_steps, plot_data[i].flatten(), marker[i], label=labels[i])
+            plt.plot(time_steps, val.flatten(), marker[i], label=labels[i])
     plt.legend()
-    plt.xlim([time_steps[0], (future + 5) * 2])
+    plt.xlim([time_steps[0], future_steps[-1] * 2])
     plt.xlabel("Time-Step")
     plt.show()
     return
 
 # Predict and plot
-for x, y in val_dataset.take(1):
-    y_pred = model.predict(x)
-    show_plot([x[0][:, 0], y[0], y_pred[0]], future, "Single Step Prediction")
+for x, y in val_dataset.take(5):
+    x_np = x.numpy()
+    y_np = y.numpy()
+    y_pred = model.predict(x_np)
+    show_plot([x_np[0][:, 0], y_np[0], y_pred[0]], future, "Single Step Prediction")
