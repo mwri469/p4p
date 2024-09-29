@@ -158,40 +158,12 @@ class Predictor:
 
 # Example usage:
 def main():
-    # Load your data
-    df = pd.read_csv('../data/fulldata.csv')
-
-    # Define feature and target columns
-    feature_columns = [
-        'WDir(Deg)', 'WSpd(m/s)', 'GustSpd(m/s)', 'WindRun(Km)', 'Rain(mm)', 
-        'Tdry(C)', 'RH(%)', 'Tmax(C)', 'Tmin(C)', 
-        'Pstn(hPa)', 'Sun(Hrs)', 'Rad(MJ/m2)'
-    ]
-    target_columns = ['Rain(mm)', 'GustSpd(m/s)', 'Pstn(hPa)', 'Sun(Hrs)', 'Rad(MJ/m2)']  # Predict multiple features
-
-    # Create Predictor instance with the in_jupyter parameter
-    predictor = Predictor(df, feature_columns, target_columns, in_jupyter=False)
-
-    # Train the models
-    predictor.train(epochs=10)
-
-    # Visualize the loss
-    #predictor.visualise_loss()
-
-    # Perform validation and get MSE
-    mse_scores = predictor.validate()
-    print("Validation MSE scores:", mse_scores)
-
-    # Predict on new data
-    new_observation = np.array([[20, 5, 7, 50, 0.2, 25, 80, 32, 21, 1015, 8, 22],
-                                [18, 6, 8, 48, 0.1, 24, 82, 31, 20, 1014, 7, 21],
-                                [19, 7, 6, 51, 0.15, 23, 81, 30, 19, 1013, 9, 23], 
-                                [20, 5, 7, 50, 0.2, 25, 80, 32, 21, 1015, 8, 22],
-                                [20, 5, 7, 50, 0.2, 25, 80, 32, 21, 1015, 8, 22],
-                                [18, 6, 8, 48, 0.1, 24, 82, 31, 20, 1014, 7, 21],
-                                [19, 7, 6, 51, 0.15, 23, 81, 30, 19, 1013, 9, 23]]) 
-    predictions = predictor.predict(new_observation)
-    print("Predictions:", predictions)
+    df = pd.read_csv('validation.csv')
+    plt.plot(df.Month, df.MSE)
+    plt.title('No. months of data input vs. model performance of validation dataset')
+    plt.ylabel('MSE Validation performance')
+    plt.xlabel('Number of months of data trained on')
+    plt.show()
 
 if __name__ == '__main__':
     sys.stdout.reconfigure(encoding='utf-8')

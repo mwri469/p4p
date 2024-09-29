@@ -24,6 +24,7 @@ class Predictor:
         self.scalerY = {tgt: MinMaxScaler() for tgt in self.target_columns}
         self.models = {}  # Dictionary to store models for each target
         self.in_jupyter = in_jupyter  # Attribute to handle Jupyter environment
+        self.idx = 0 # Index for epoch loss graph colour
 
         if not in_jupyter: sys.stdout.reconfigure(encoding='utf-8') # allows for utf-8 encoding in terminal
 
@@ -116,8 +117,9 @@ class Predictor:
     def train(self, epochs=10):
         for tgt, model in self.models.items():
             print(f"Training model for {tgt}...")
-            print(self.train_dataset[tgt])
             es_callback = keras.callbacks.EarlyStopping(monitor='val_loss', patience=5)
+            if self.in_jupyter: vbs = 1
+            else: vbs = 0
             modelckpt_callback = keras.callbacks.ModelCheckpoint(
                 f'{tgt}_model_checkpoint.weights.h5',
                 monitor='val_loss',
@@ -128,7 +130,8 @@ class Predictor:
                 self.train_dataset[tgt],
                 epochs=epochs,
                 validation_data=self.test_dataset[tgt],
-                callbacks=[es_callback, modelckpt_callback]
+                callbacks=[es_callback, modelckpt_callback],
+                verbose=vbs
             )
             self.models[tgt] = model
             self.history = history
@@ -142,7 +145,9 @@ class Predictor:
             val_loss = self.models[tgt].history.history['val_loss']
             epochs = range(len(loss))
             #plt.plot(epochs, loss, 'b', label=f'Training loss ({tgt})')
-            plt.plot(epochs, val_loss, 'r', label=f'Validation loss ({tgt})')
+            col = ['r','g','b','k','m'][self.idx]
+            self.idx += 1 % 5
+            plt.plot(epochs, val_loss, col, label=f'Validation loss ({tgt})')
         plt.title(title)
         plt.xlabel('Epochs')
         plt.ylabel('Loss')
@@ -179,7 +184,6 @@ class Predictor:
 
         return mse_scores
 
-
     def predict(self, new_data: np.array):
         # Rescale new data
         new_data_scaled = self.scaler.transform(new_data)
@@ -211,6 +215,30 @@ class Predictor:
                 plt.xlabel("Time-Step")
                 plt.ylabel(tgt)
                 plt.show()
+
+
+class DataProcessor:
+    """ This class has been designed to work in conjunction with the Predictor class
+    The methods exist to undergo various forms of preprocessing"""
+    def __init__(self, dataframe):
+        self.df = dataframe
+
+    def dt_col(self):
+        # Converts the 'Day(Local_Date)' feature to a pd.DateTime object
+        self.df['Day(Local_Date)'] = pd.to_datetime(self.df['Day(Local_Date)'], format='%Y%m%d:%H%M')
+
+        self.max_date = self.df['Day(Local_Date)'].max()
+        self.min_date = self.df['Day(Local_Date)'].min()
+
+    def test_val_split(self, num_months=3):
+        end_point = self.max_date - pd.DateOffset(months=num_months)
+
+        test_set = self.df.loc[(self.df['Day(Local_Date)'].dt.year <= end_point.year) &
+                        (self.df['Day(Local_Date)'].dt.month <= end_point.month)]
+        val_set = self.df.loc[(self.df['Day(Local_Date)'].dt.year > end_point.year) &
+                        (self.df['Day(Local_Date)'].dt.month > end_point.month)]
+        
+        return test_set, val_set
 
 # Example usage:
 def main():

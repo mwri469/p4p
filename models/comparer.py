@@ -10,8 +10,8 @@ def fitness(day_prediction):
     Inputs: passed in as a dictionary <- {'Rain(mm)': [loc1, loc2], 'GustSpd(m/s)': [loc1, loc2], 'Pstn(Pstn(hPa)': ...,
                                             'Sun(Hrs)': ..., 'Rad(MJ/m2)': [loc1, loc2]}"""
     # Define the different parameters and their weightings
-    params = ['Rain(mm)', 'GustSpd(m/s)', 'Pstn(hPa)', 'Sun(Hrs)', 'Rad(MJ/m2)']
-    weights = [0.3, 0.3, 0.1, 0.1, 0.1]
+    params = ['Rain(mm)', 'GustSpd(m/s)', 'Pstn(hPa)', 'Rad(MJ/m2)']
+    weights = [0.3, 0.3, 0.1, 0.2]
 
     # Invert station pressure variable as higher pressure is more likely to mean better weather
     day_prediction['Pstn(hPa)'] = (-1)*day_prediction['Pstn(hPa)']
@@ -20,7 +20,8 @@ def fitness(day_prediction):
     loc1, loc2 = 0,0
 
     for idx in range(len(params)):
-        loc1, loc2 += weights[idx]*day_prediction[params[idx]][0], day_prediction[params[idx]][1]
+        loc1 += weights[idx]*day_prediction[params[idx]][0]
+        loc2 += weights[idx]*day_prediction[params[idx]][1]
 
     # Return index of better location
     if loc1 <= loc2:
