@@ -14,7 +14,7 @@ def fitness(day_prediction):
     weights = [0.3, 0.3, 0.1, 0.2]
 
     # Invert station pressure variable as higher pressure is more likely to mean better weather
-    day_prediction['Pstn(hPa)'] = (-1)*day_prediction['Pstn(hPa)']
+    day_prediction['Pstn(hPa)'] = [-1*x for x in day_prediction['Pstn(hPa)']]
 
     # Calculate a score for both locations
     loc1, loc2 = 0,0

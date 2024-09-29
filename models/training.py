@@ -58,27 +58,102 @@ def eval_locs_on_comp(file1_name, file2_name):
     loc1 = pd.read_csv(file1_name)
     loc2 = pd.read_csv(file2_name)
 
-    loc1_process = DataProcessor(loc1)
-    loc2_process = DataProcessor(loc2)
+    processor = DataProcessor()
 
+    # Process the data
+    loc1_process = DataProcessor()
+    loc1_process.optional__init__(loc1)
+    loc2_process = DataProcessor()
+    loc2_process.optional__init__(loc2)
+
+    # Assuming dt_col handles date-time column processing
     loc1_process.dt_col()
     loc2_process.dt_col()
 
+    # Ensure both locations have data for the same timespan
     assert loc1_process.max_date == loc2_process.max_date
 
+    # Split into test and validation sets
     loc1_test, loc1_val = loc1_process.test_val_split(num_months=12)
     loc2_test, loc2_val = loc2_process.test_val_split(num_months=12)
 
+    # Initialize the models
     loc1_model = Predictor(loc1_test, FEATURES, TARGETS)
     loc2_model = Predictor(loc2_test, FEATURES, TARGETS)
 
-    print(loc1_val.head())
-    for obs in loc1_val:
-        print(obs)
+    # Prepare results tracking
+    correct_predictions = 0
+    total_comparisons = 0
+
+    # Iterate over validation data
+    for i in range(len(loc1_val) - loc1_model.past - loc1_model.future + 1):
+        # Get past 7 days (loc1_model.past) of data for both locations
+        loc1_past_data = loc1_val[loc1_model.feature_columns].iloc[i:i + loc1_model.past].values
+        loc2_past_data = loc2_val[loc2_model.feature_columns].iloc[i:i + loc2_model.past].values
+
+        # Ensure the data is non-normalized and is in the correct shape (7 days of data)
+        loc1_past_data = np.array(loc1_past_data)
+        loc2_past_data = np.array(loc2_past_data)
+
+        # Predict future weather conditions (next 5 days)
+        loc1_predictions = loc1_model.predict(loc1_past_data)
+        loc2_predictions = loc2_model.predict(loc2_past_data)
+
+        # Compare predictions using comparer()
+        # Assume comparer() takes a dictionary like {'Rain(mm)': [loc1, loc2], 'GustSpd(m/s)': [loc1, loc2], ...}
+        comparison_inputs = {
+            feature: [loc1_predictions[feature][0][0], loc2_predictions[feature][0][0]]  # Compare only the first predicted day
+            for feature in TARGETS
+        }
+        
+        # comparer() returns 0 if loc1 is better, 1 if loc2 is better
+        better_location = fitness(comparison_inputs)
+
+        # Get the actual future weather (next 5 days) for both locations
+        loc1_actual = loc1_val[TARGETS].iloc[i + loc1_model.past:i + loc1_model.past + loc1_model.future].values
+        loc2_actual = loc2_val[TARGETS].iloc[i + loc2_model.past:i + loc2_model.past + loc2_model.future].values
+
+        # Compare the actual better location using the same comparer logic
+        # Use the scalerY from trained model to normalise data and match the model testing
+        actual_inputs = {
+            feature: np.array([loc1_model.scalerY[feature].transform(
+                                np.float32(loc1_actual[0][idx]).reshape((-1,1))
+                                ),
+                                loc1_model.scalerY[feature].transform(
+                                np.float32(loc2_actual[0][idx]).reshape((-1,1))
+                                )
+                                ], 
+                                dtype=np.float32)  # Compare only the first actual day
+            for idx, feature in enumerate(TARGETS)
+        }
+
+        # Flatten lists
+        for feature in TARGETS:
+            actual_inputs[feature] = actual_inputs[feature].flatten()
+
+        actual_better_location = fitness(actual_inputs)
+
+        # Increment correct predictions if the model's prediction matches the actual outcome
+        if better_location == actual_better_location:
+            correct_predictions += 1
+        total_comparisons += 1
+
+    # Calculate and print the accuracy of the model in predicting the better location
+    accuracy = correct_predictions / total_comparisons
+    print(f"Model accuracy in predicting the better location: {accuracy:.2%}")
+    return accuracy
+
 
 def main():
+    # Set filepath for data
     f1 = './data/motat020316_010924.csv'
     f2 = './data/leigh020316_010924.csv'
+
+    # Run hyperparameter gridsearch
+    options = {
+        
+    }
+
     eval_locs_on_comp(f1, f2)
 
 

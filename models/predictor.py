@@ -12,34 +12,33 @@ import tensorflow as tf
 import sys
 
 class Predictor:
-    def __init__(self, dataframe: pd.DataFrame, feature_columns: list, target_columns: list, past=7, future=5, split_fraction=0.715, in_jupyter=False):
-        self.show_plots = False
+    def __init__(self, dataframe: pd.DataFrame, feature_columns: list, target_columns: list,
+                 using_options=False, options=None):
+        self.options = options
+        self.show_plots = options['show_plots'] if using_options else False
         self.dataframe = dataframe
         self.feature_columns = feature_columns
-        self.target_columns = target_columns  # List of target columns
-        self.past = past
-        self.future = future
-        self.split_fraction = split_fraction
+        self.target_columns = target_columns
+        self.past = options['past'] if using_options else 7
+        self.future = options['future'] if using_options else 5
+        self.split_fraction = options['split_fraction'] if using_options else 0.715
         self.scaler = MinMaxScaler()
         self.scalerY = {tgt: MinMaxScaler() for tgt in self.target_columns}
-        self.models = {}  # Dictionary to store models for each target
-        self.in_jupyter = in_jupyter  # Attribute to handle Jupyter environment
-        self.idx = 0 # Index for epoch loss graph colour
-
-        if not in_jupyter: sys.stdout.reconfigure(encoding='utf-8') # allows for utf-8 encoding in terminal
-
+        self.models = {}
+        self.idx = 0  # For plotting purposes
+        self.in_jupyter = options['in_jupyter'] if using_options else False
+        
         # Prepare the data
         self._prepare_data()
-
-        # Build models for each target
+        
+        # Build models using the architecture provided in options
         self._build_models()
 
     def _prepare_data(self):
-        # Extract features and targets
         features = self.dataframe[self.feature_columns].values
-        self.targets = {tgt: self.scalerY[tgt].fit_transform(self.clean_numpy(self.dataframe[tgt].values).reshape(-1, 1)) for tgt in self.target_columns}
+        self.targets = {tgt: self.scalerY[tgt].fit_transform(self.clean_numpy(self.dataframe[tgt].values).reshape(-1, 1))
+                        for tgt in self.target_columns}
 
-        # Normalise the features
         features = self.clean_numpy(features)
         self.features_scaled = self.scaler.fit_transform(features)
 
@@ -53,8 +52,10 @@ class Predictor:
 
         self.train_dataset, self.test_dataset = {}, {}
         for tgt in self.target_columns:
-            X_train, X_val = np.asarray(self.X[tgt][:self.train_split[tgt]]).astype('float64'), np.asarray(self.X[tgt][self.train_split[tgt]:]).astype('float64')
-            y_train, y_val = np.asarray(self.y[tgt][:self.train_split[tgt]]).astype('float64'), np.asarray(self.y[tgt][self.train_split[tgt]:]).astype('float64')
+            X_train = np.asarray(self.X[tgt][:self.train_split[tgt]]).astype('float64')
+            X_val = np.asarray(self.X[tgt][self.train_split[tgt]:]).astype('float64')
+            y_train = np.asarray(self.y[tgt][:self.train_split[tgt]]).astype('float64')
+            y_val = np.asarray(self.y[tgt][self.train_split[tgt]:]).astype('float64')
 
             self.train_dataset[tgt] = tf.data.Dataset.from_tensor_slices((X_train, y_train)).batch(256).prefetch(tf.data.experimental.AUTOTUNE)
             self.test_dataset[tgt] = tf.data.Dataset.from_tensor_slices((X_val, y_val)).batch(256).prefetch(tf.data.experimental.AUTOTUNE)
@@ -102,16 +103,22 @@ class Predictor:
 
     def _build_models(self):
         for tgt in self.target_columns:
-            model = Sequential([
-                LSTM(32, input_shape=(self.past, self.X[tgt].shape[2])),
-                Dense(self.future)
-            ])
-            model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.001), loss='mse')
+            if self.options is None:
+                # Use default LSTM model if no options are provided
+                model = Sequential([
+                    LSTM(32, input_shape=(self.past, self.X[tgt].shape[2])),
+                    Dense(self.future)
+                ])
+            else:
+                # Use the model passed in the options dictionary
+                model_func = self.options['model']
+                model = model_func(self.past, self.future, self.X[tgt].shape)
+
+            # Compile the model with the specified optimizer and loss function
+            model.compile(optimizer=self.options['optimiser'], loss='mse')
             
-            # Do not run model.summary() if in_jupyter is True
-            if self.in_jupyter:
-                model.summary()
-            
+            if self.in_jupyter: model.summary()
+
             self.models[tgt] = model
 
     def train(self, epochs=10):
@@ -216,11 +223,60 @@ class Predictor:
                 plt.ylabel(tgt)
                 plt.show()
 
+def is_array_like0(obj):
+    """Checks if an object is array-like.
+    Args:
+        obj: The object to check.
+    Returns:
+        True if the object is array-like, False otherwise.
+    """
+
+    return isinstance(obj, np.ndarray) or hasattr(obj, '__iter__') and not isinstance(obj, str)
+    
+def clean_numpy0(numpy_arr):
+        """ Cleans and imputes numpy arrays """
+        for obs in range(len(numpy_arr)):
+            # Check for NaN values
+            if not is_array_like0(numpy_arr[0]):
+                if numpy_arr[obs] == '-':
+                    if obs == 0:
+                        numpy_arr[obs] = np.float64(0)
+                    else:
+                        numpy_arr[obs] = np.float64(numpy_arr[obs-1])
+                else:
+                    numpy_arr[obs] = np.float64(numpy_arr[obs])
+            else:
+                for feat in range(len(numpy_arr[0])):
+                    if numpy_arr[obs,feat] == '-' or numpy_arr[obs,feat] == '' or numpy_arr[obs,feat] == np.nan:
+                        if obs == 0:
+                            numpy_arr[obs,feat] = np.float64(0)
+                        else:
+                            numpy_arr[obs,feat] = numpy_arr[obs-1,feat]
+                    else:
+                        numpy_arr[obs,feat] = np.float64(numpy_arr[obs,feat])
+
+        return numpy_arr
 
 class DataProcessor:
     """ This class has been designed to work in conjunction with the Predictor class
     The methods exist to undergo various forms of preprocessing"""
-    def __init__(self, dataframe):
+    def __init__(self):
+        self.base_options = {
+        'show_plots': False,
+        'past': 7,
+        'future': 5,
+        'split_fraction':0.715,
+        'model': self.seq_model,
+        'optimiser': keras.optimizers.Adam(learning_rate=0.001)    
+    }
+        
+    def seq_model(self, s_past, s_future, s_X, s_tgt):
+        return Sequential([
+                    LSTM(32, input_shape=(s_past, s_X[s_tgt].shape[2])),
+                    Dense(s_future)
+                        ])
+
+    def optional__init__(self, dataframe):
         self.df = dataframe
 
     def dt_col(self):
@@ -235,10 +291,19 @@ class DataProcessor:
 
         test_set = self.df.loc[(self.df['Day(Local_Date)'].dt.year <= end_point.year) &
                         (self.df['Day(Local_Date)'].dt.month <= end_point.month)]
-        val_set = self.df.loc[(self.df['Day(Local_Date)'].dt.year > end_point.year) &
-                        (self.df['Day(Local_Date)'].dt.month > end_point.month)]
+        val_set = self.df.loc[(self.df['Day(Local_Date)'].dt.year >= end_point.year) &
+                        (self.df['Day(Local_Date)'].dt.month >= end_point.month)]
         
         return test_set, val_set
+    
+    def extra_flatten(self, orig_list):
+        flattened = []
+        for item in orig_list:
+            if isinstance(item, list):
+                flattened.extend(self.extra_flatten(item))
+            else:
+                flattened.extend(item)
+        return flattened
 
 # Example usage:
 def main():
