@@ -27,6 +27,7 @@ class Predictor:
         self.models = {}
         self.idx = 0  # For plotting purposes
         self.in_jupyter = options['in_jupyter'] if using_options else False
+        if not self.in_jupyter: sys.stdout.reconfigure(encoding='utf-8') # allows for utf-8 encoding in terminal
         
         # Prepare the data
         self._prepare_data()
@@ -109,13 +110,15 @@ class Predictor:
                     LSTM(32, input_shape=(self.past, self.X[tgt].shape[2])),
                     Dense(self.future)
                 ])
+
+                model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.001), loss='mse')
             else:
                 # Use the model passed in the options dictionary
                 model_func = self.options['model']
                 model = model_func(self.past, self.future, self.X[tgt].shape)
 
-            # Compile the model with the specified optimizer and loss function
-            model.compile(optimizer=self.options['optimiser'], loss='mse')
+                # Compile the model with the specified optimizer and loss function
+                model.compile(optimizer=self.options['optimiser'], loss='mse')
             
             if self.in_jupyter: model.summary()
 
@@ -200,7 +203,8 @@ class Predictor:
 
         predictions = {}
         for tgt, model in self.models.items():
-            pred = model.predict(new_data_scaled)
+            vbose = 0 if self.options is None else 1
+            pred = model.predict(new_data_scaled, verbose=vbose)
             predictions[tgt] = pred
         return predictions
 
@@ -259,7 +263,8 @@ def clean_numpy0(numpy_arr):
 
 class DataProcessor:
     """ This class has been designed to work in conjunction with the Predictor class
-    The methods exist to undergo various forms of preprocessing"""
+    The methods exist to undergo various forms of preprocessing.
+    The 'model' and 'optimiser' options can be customised for grid search purposes."""
     def __init__(self):
         self.base_options = {
         'show_plots': False,
@@ -267,7 +272,8 @@ class DataProcessor:
         'future': 5,
         'split_fraction':0.715,
         'model': self.seq_model,
-        'optimiser': keras.optimizers.Adam(learning_rate=0.001)    
+        'optimiser': self.opti(0.001),
+        'in_jupyter': False
     }
         
     def seq_model(self, s_past, s_future, s_X, s_tgt):
@@ -275,6 +281,9 @@ class DataProcessor:
                     LSTM(32, input_shape=(s_past, s_X[s_tgt].shape[2])),
                     Dense(s_future)
                         ])
+
+    def opti(self, lr):
+        return keras.optimizers.Adam(learning_rate=lr)
 
     def optional__init__(self, dataframe):
         self.df = dataframe

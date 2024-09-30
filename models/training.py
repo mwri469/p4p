@@ -3,6 +3,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from predictor import Predictor, DataProcessor
 from comparer import fitness
+import keras
+from keras.models import Sequential # type: ignore
+from keras.layers import LSTM, Dense # type: ignore
+from model_funcs import *
 
 # Define feature and target columns
 FEATURES = [
@@ -53,7 +57,14 @@ def eval_over_time(df, num_months):
     plt.xlabel('Number of months of data trained on')
     plt.show()
 
-def eval_locs_on_comp(file1_name, file2_name):
+def seq_model(self, s_past, s_future, s_X, s_tgt):
+    return Sequential([
+                LSTM(32, input_shape=(s_past, s_X[s_tgt].shape[2])),
+                Dense(s_future)
+                    ])
+
+
+def eval_locs_on_comp(file1_name, file2_name, options):
     # Loading in two datasets of the same timespan
     loc1 = pd.read_csv(file1_name)
     loc2 = pd.read_csv(file2_name)
@@ -78,8 +89,8 @@ def eval_locs_on_comp(file1_name, file2_name):
     loc2_test, loc2_val = loc2_process.test_val_split(num_months=12)
 
     # Initialize the models
-    loc1_model = Predictor(loc1_test, FEATURES, TARGETS)
-    loc2_model = Predictor(loc2_test, FEATURES, TARGETS)
+    loc1_model = Predictor(loc1_test, FEATURES, TARGETS, using_options=True, options=options)
+    loc2_model = Predictor(loc2_test, FEATURES, TARGETS, using_options=True, options=options)
 
     # Prepare results tracking
     correct_predictions = 0
@@ -143,6 +154,33 @@ def eval_locs_on_comp(file1_name, file2_name):
     print(f"Model accuracy in predicting the better location: {accuracy:.2%}")
     return accuracy
 
+def grid_search():
+    dp = DataProcessor()
+
+    # Define different model architectures and learning rates for grid search
+    models = [
+        dp.seq_model,  # Default model
+        create_custom_model,  # More complex architecture
+        single_lstm_dense_output,
+        two_layer_lstm,
+        lstm_with_dropout,
+        bidirectional_lstm,
+        lstm_with_recurrent_dropout,
+        deep_lstm_with_dense_layers,
+        cnn_lstm_hybrid,
+        shallow_lstm_linear_output
+    ]
+
+    learning_rates = [0.01, 0.005, 0.001, 0.0005, 0.0001]
+
+    results = {'Model': [], 'Learning Rate': [], 'Accuracy': []}
+
+    for md in models:
+        for lr in learning_rates:
+            dp.base_options['model'] = md
+            dp.base_options['optimiser'] = dp.opti(lr)
+
+
 
 def main():
     # Set filepath for data
@@ -158,7 +196,7 @@ def main():
 
 
 def main0():
-    loc1_data = pd.read_csv('./data/motat020316_010924.csv')
+    loc1_data = pd.read_csv('./data/leigh2010_010924.csv')
     loc1_data['Day(Local_Date)'] = pd.to_datetime(loc1_data['Day(Local_Date)'], format='%Y%m%d:%H%M')
     n_months = 0
     start = loc1_data['Day(Local_Date)'].min()
