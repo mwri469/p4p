@@ -1,0 +1,51 @@
+,Model,Learning Rate,MSE
+0,<bound method DataProcessor.seq_model of <predictor.DataProcessor object at 0x00000148F87A7FD0>>,0.01,0.2578963862285508
+1,<bound method DataProcessor.seq_model of <predictor.DataProcessor object at 0x00000148F87A7FD0>>,0.005,0.24989458315258517
+2,<bound method DataProcessor.seq_model of <predictor.DataProcessor object at 0x00000148F87A7FD0>>,0.001,0.2618590240862882
+3,<bound method DataProcessor.seq_model of <predictor.DataProcessor object at 0x00000148F87A7FD0>>,0.0005,0.2683442024920457
+4,<bound method DataProcessor.seq_model of <predictor.DataProcessor object at 0x00000148F87A7FD0>>,0.0001,0.25230126866047936
+5,<function create_custom_model at 0x00000148A47F56C0>,0.01,0.2589435016186411
+6,<function create_custom_model at 0x00000148A47F56C0>,0.005,0.20784602648586747
+7,<function create_custom_model at 0x00000148A47F56C0>,0.001,0.27225438647087696
+8,<function create_custom_model at 0x00000148A47F56C0>,0.0005,0.2123334696139329
+9,<function create_custom_model at 0x00000148A47F56C0>,0.0001,0.24081002479419758
+10,<function single_lstm_dense_output at 0x00000148A47F5870>,0.01,0.2816090183597929
+11,<function single_lstm_dense_output at 0x00000148A47F5870>,0.005,0.35055650006672134
+12,<function single_lstm_dense_output at 0x00000148A47F5870>,0.001,0.21258263718451315
+13,<function single_lstm_dense_output at 0x00000148A47F5870>,0.0005,0.22177559686372708
+14,<function single_lstm_dense_output at 0x00000148A47F5870>,0.0001,0.3095871604583074
+15,<function two_layer_lstm at 0x00000148A47F5900>,0.01,0.2206592368599823
+16,<function two_layer_lstm at 0x00000148A47F5900>,0.005,0.2629549721059683
+17,<function two_layer_lstm at 0x00000148A47F5900>,0.001,0.23746414944509953
+18,<function two_layer_lstm at 0x00000148A47F5900>,0.0005,0.20576969393376052
+19,<function two_layer_lstm at 0x00000148A47F5900>,0.0001,0.20097634325130737
+20,<function lstm_with_dropout at 0x00000148A47F5990>,0.01,0.2319186923067178
+21,<function lstm_with_dropout at 0x00000148A47F5990>,0.005,0.22793762385117933
+22,<function lstm_with_dropout at 0x00000148A47F5990>,0.001,0.23948109842428633
+23,<function lstm_with_dropout at 0x00000148A47F5990>,0.0005,0.2706220985926997
+24,<function lstm_with_dropout at 0x00000148A47F5990>,0.0001,0.21505652744182374
+25,<function bidirectional_lstm at 0x00000148A47F5A20>,0.01,0.25484156423743265
+26,<function bidirectional_lstm at 0x00000148A47F5A20>,0.005,0.2425660992736459
+27,<function bidirectional_lstm at 0x00000148A47F5A20>,0.001,0.25083747807540496
+28,<function bidirectional_lstm at 0x00000148A47F5A20>,0.0005,0.31647045750605624
+29,<function bidirectional_lstm at 0x00000148A47F5A20>,0.0001,0.19645559394294304
+30,<function lstm_with_recurrent_dropout at 0x00000148A47F5AB0>,0.01,0.20331688904653672
+31,<function lstm_with_recurrent_dropout at 0x00000148A47F5AB0>,0.005,0.2976272962703578
+32,<function lstm_with_recurrent_dropout at 0x00000148A47F5AB0>,0.001,0.29412244975927665
+33,<function lstm_with_recurrent_dropout at 0x00000148A47F5AB0>,0.0005,0.21058954656789566
+34,<function lstm_with_recurrent_dropout at 0x00000148A47F5AB0>,0.0001,0.25237083049792264
+35,<function deep_lstm_with_dense_layers at 0x00000148A47F5B40>,0.01,0.2243524518237536
+36,<function deep_lstm_with_dense_layers at 0x00000148A47F5B40>,0.005,0.22798991862361206
+37,<function deep_lstm_with_dense_layers at 0x00000148A47F5B40>,0.001,0.2201144756024041
+38,<function deep_lstm_with_dense_layers at 0x00000148A47F5B40>,0.0005,0.2151818029452466
+39,<function deep_lstm_with_dense_layers at 0x00000148A47F5B40>,0.0001,0.209461245242419
+40,<function cnn_lstm_hybrid at 0x00000148A47F5BD0>,0.01,0.2465043933311707
+41,<function cnn_lstm_hybrid at 0x00000148A47F5BD0>,0.005,0.24598188790972808
+42,<function cnn_lstm_hybrid at 0x00000148A47F5BD0>,0.001,0.21990523795794795
+43,<function cnn_lstm_hybrid at 0x00000148A47F5BD0>,0.0005,0.209866920367779
+44,<function cnn_lstm_hybrid at 0x00000148A47F5BD0>,0.0001,0.23315585019687596
+45,<function shallow_lstm_linear_output at 0x00000148A47F5C60>,0.01,0.24077126933830778
+46,<function shallow_lstm_linear_output at 0x00000148A47F5C60>,0.005,0.27185392170280803
+47,<function shallow_lstm_linear_output at 0x00000148A47F5C60>,0.001,0.2919539467634472
+48,<function shallow_lstm_linear_output at 0x00000148A47F5C60>,0.0005,0.2542422081318608
+49,<function shallow_lstm_linear_output at 0x00000148A47F5C60>,0.0001,0.2977474502995211

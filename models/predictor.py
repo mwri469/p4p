@@ -186,7 +186,8 @@ class Predictor:
             ])
             
             # Get predictions from the model
-            y_pred = model.predict(X_val[:len(y_tgt)])  # Ensure the same length for X_val and y_tgt
+            vbose = 0 if not self.in_jupyter else 1
+            y_pred = model.predict(X_val[:len(y_tgt)], verbose=vbose)  # Ensure the same length for X_val and y_tgt
             
             # Calculate MSE between predictions and actual targets
             mse = mean_squared_error(y_tgt, y_pred)
@@ -276,9 +277,9 @@ class DataProcessor:
         'in_jupyter': False
     }
         
-    def seq_model(self, s_past, s_future, s_X, s_tgt):
+    def seq_model(self, s_past, s_future, shape):
         return Sequential([
-                    LSTM(32, input_shape=(s_past, s_X[s_tgt].shape[2])),
+                    LSTM(32, input_shape=(s_past, shape[2])),
                     Dense(s_future)
                         ])
 

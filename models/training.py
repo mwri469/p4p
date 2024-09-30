@@ -7,6 +7,12 @@ import keras
 from keras.models import Sequential # type: ignore
 from keras.layers import LSTM, Dense # type: ignore
 from model_funcs import *
+import tensorflow as tf
+tf.keras.config.disable_interactive_logging()
+def warn(*args, **kwargs):
+    pass
+import warnings
+warnings.warn = warn
 
 # Define feature and target columns
 FEATURES = [
@@ -40,6 +46,7 @@ def eval_over_time(df, num_months):
         # Last 3 months is validation data
         # This line filters data down to right range
         end_point = start_train + pd.DateOffset(months=month)
+        print(f'Training on current date: {end_point.month}, {end_point.year} . . .')
         df_months_filtered = df.loc[(df['Day(Local_Date)'].dt.year <= end_point.year) &
                                     (df['Day(Local_Date)'].dt.month <= end_point.month)]
         # print(df_months_filtered[0:10])
@@ -62,7 +69,6 @@ def seq_model(self, s_past, s_future, s_X, s_tgt):
                 LSTM(32, input_shape=(s_past, s_X[s_tgt].shape[2])),
                 Dense(s_future)
                     ])
-
 
 def eval_locs_on_comp(file1_name, file2_name, options):
     # Loading in two datasets of the same timespan
@@ -168,21 +174,51 @@ def grid_search():
         lstm_with_recurrent_dropout,
         deep_lstm_with_dense_layers,
         cnn_lstm_hybrid,
-        shallow_lstm_linear_output
-    ]
+        shallow_lstm_linear_output,
+        two_layer_bidirectional_lstm,
+        deep_bidirectional_lstm_with_dropout,
+        bidirectional_lstm_with_recurrent_dropout,
+        bidirectional_lstm_with_dense_layers,
+        cnn_bidirectional_lstm_hybrid,
+        very_deep_bidirectional_lstm,
+        bidirectional_lstm_with_batch_norm,
+        bidirectional_lstm_with_attention,
+        bidirectional_lstm_with_residual_connections,
+        bidirectional_lstm_with_gru
+        ]   
 
-    learning_rates = [0.01, 0.005, 0.001, 0.0005, 0.0001]
+    learning_rates = [0.01, 0.005, 0.001, 0.0005, 0.0001, 0.00001]
 
-    results = {'Model': [], 'Learning Rate': [], 'Accuracy': []}
+    df = pd.read_csv('./data/leigh2010_010924.csv')
+
+    dp.optional__init__(df)
+    dp.dt_col()
+    test, val = dp.test_val_split(num_months=9)
+
+    results = {'Model': [], 'Learning Rate': [], 'MSE': []}
 
     for md in models:
         for lr in learning_rates:
+            print(f'Testing model {md} on learning rate {lr} . . .')
             dp.base_options['model'] = md
             dp.base_options['optimiser'] = dp.opti(lr)
 
-
+            predictor = Predictor(dataframe=test, feature_columns=FEATURES, target_columns=TARGETS,
+                                  using_options=True, options=dp.base_options)
+            
+            results['Learning Rate'].append(lr)
+            results['Model'].append(md)
+            results['MSE'].append(np.mean(list(
+                predictor.validate(val).values()
+                )))
+            
+    newdf = pd.DataFrame(results)
+    newdf.to_csv('./data/grid_search.csv')
 
 def main():
+    grid_search()
+
+def main0():
     # Set filepath for data
     f1 = './data/motat020316_010924.csv'
     f2 = './data/leigh020316_010924.csv'
@@ -195,7 +231,7 @@ def main():
     eval_locs_on_comp(f1, f2)
 
 
-def main0():
+def main1():
     loc1_data = pd.read_csv('./data/leigh2010_010924.csv')
     loc1_data['Day(Local_Date)'] = pd.to_datetime(loc1_data['Day(Local_Date)'], format='%Y%m%d:%H%M')
     n_months = 0
