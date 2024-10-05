@@ -118,7 +118,8 @@ class Predictor:
                 model = model_func(self.past, self.future, self.X[tgt].shape)
 
                 # Compile the model with the specified optimizer and loss function
-                model.compile(optimizer=self.options['optimiser'], loss='mse')
+                model.compile(optimizer=keras.optimizers.Adam(
+                    learning_rate=self.options['learning rate']), loss='mse')
             
             if self.in_jupyter: model.summary()
 
@@ -273,7 +274,7 @@ class DataProcessor:
         'future': 5,
         'split_fraction':0.715,
         'model': self.seq_model,
-        'optimiser': self.opti(0.001),
+        'learning rate': 0.001,
         'in_jupyter': False
     }
         

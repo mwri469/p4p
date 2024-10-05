@@ -1,51 +1,145 @@
-,Model,Learning Rate,MSE
-0,<bound method DataProcessor.seq_model of <predictor.DataProcessor object at 0x00000148F87A7FD0>>,0.01,0.2578963862285508
-1,<bound method DataProcessor.seq_model of <predictor.DataProcessor object at 0x00000148F87A7FD0>>,0.005,0.24989458315258517
-2,<bound method DataProcessor.seq_model of <predictor.DataProcessor object at 0x00000148F87A7FD0>>,0.001,0.2618590240862882
-3,<bound method DataProcessor.seq_model of <predictor.DataProcessor object at 0x00000148F87A7FD0>>,0.0005,0.2683442024920457
-4,<bound method DataProcessor.seq_model of <predictor.DataProcessor object at 0x00000148F87A7FD0>>,0.0001,0.25230126866047936
-5,<function create_custom_model at 0x00000148A47F56C0>,0.01,0.2589435016186411
-6,<function create_custom_model at 0x00000148A47F56C0>,0.005,0.20784602648586747
-7,<function create_custom_model at 0x00000148A47F56C0>,0.001,0.27225438647087696
-8,<function create_custom_model at 0x00000148A47F56C0>,0.0005,0.2123334696139329
-9,<function create_custom_model at 0x00000148A47F56C0>,0.0001,0.24081002479419758
-10,<function single_lstm_dense_output at 0x00000148A47F5870>,0.01,0.2816090183597929
-11,<function single_lstm_dense_output at 0x00000148A47F5870>,0.005,0.35055650006672134
-12,<function single_lstm_dense_output at 0x00000148A47F5870>,0.001,0.21258263718451315
-13,<function single_lstm_dense_output at 0x00000148A47F5870>,0.0005,0.22177559686372708
-14,<function single_lstm_dense_output at 0x00000148A47F5870>,0.0001,0.3095871604583074
-15,<function two_layer_lstm at 0x00000148A47F5900>,0.01,0.2206592368599823
-16,<function two_layer_lstm at 0x00000148A47F5900>,0.005,0.2629549721059683
-17,<function two_layer_lstm at 0x00000148A47F5900>,0.001,0.23746414944509953
-18,<function two_layer_lstm at 0x00000148A47F5900>,0.0005,0.20576969393376052
-19,<function two_layer_lstm at 0x00000148A47F5900>,0.0001,0.20097634325130737
-20,<function lstm_with_dropout at 0x00000148A47F5990>,0.01,0.2319186923067178
-21,<function lstm_with_dropout at 0x00000148A47F5990>,0.005,0.22793762385117933
-22,<function lstm_with_dropout at 0x00000148A47F5990>,0.001,0.23948109842428633
-23,<function lstm_with_dropout at 0x00000148A47F5990>,0.0005,0.2706220985926997
-24,<function lstm_with_dropout at 0x00000148A47F5990>,0.0001,0.21505652744182374
-25,<function bidirectional_lstm at 0x00000148A47F5A20>,0.01,0.25484156423743265
-26,<function bidirectional_lstm at 0x00000148A47F5A20>,0.005,0.2425660992736459
-27,<function bidirectional_lstm at 0x00000148A47F5A20>,0.001,0.25083747807540496
-28,<function bidirectional_lstm at 0x00000148A47F5A20>,0.0005,0.31647045750605624
-29,<function bidirectional_lstm at 0x00000148A47F5A20>,0.0001,0.19645559394294304
-30,<function lstm_with_recurrent_dropout at 0x00000148A47F5AB0>,0.01,0.20331688904653672
-31,<function lstm_with_recurrent_dropout at 0x00000148A47F5AB0>,0.005,0.2976272962703578
-32,<function lstm_with_recurrent_dropout at 0x00000148A47F5AB0>,0.001,0.29412244975927665
-33,<function lstm_with_recurrent_dropout at 0x00000148A47F5AB0>,0.0005,0.21058954656789566
-34,<function lstm_with_recurrent_dropout at 0x00000148A47F5AB0>,0.0001,0.25237083049792264
-35,<function deep_lstm_with_dense_layers at 0x00000148A47F5B40>,0.01,0.2243524518237536
-36,<function deep_lstm_with_dense_layers at 0x00000148A47F5B40>,0.005,0.22798991862361206
-37,<function deep_lstm_with_dense_layers at 0x00000148A47F5B40>,0.001,0.2201144756024041
-38,<function deep_lstm_with_dense_layers at 0x00000148A47F5B40>,0.0005,0.2151818029452466
-39,<function deep_lstm_with_dense_layers at 0x00000148A47F5B40>,0.0001,0.209461245242419
-40,<function cnn_lstm_hybrid at 0x00000148A47F5BD0>,0.01,0.2465043933311707
-41,<function cnn_lstm_hybrid at 0x00000148A47F5BD0>,0.005,0.24598188790972808
-42,<function cnn_lstm_hybrid at 0x00000148A47F5BD0>,0.001,0.21990523795794795
-43,<function cnn_lstm_hybrid at 0x00000148A47F5BD0>,0.0005,0.209866920367779
-44,<function cnn_lstm_hybrid at 0x00000148A47F5BD0>,0.0001,0.23315585019687596
-45,<function shallow_lstm_linear_output at 0x00000148A47F5C60>,0.01,0.24077126933830778
-46,<function shallow_lstm_linear_output at 0x00000148A47F5C60>,0.005,0.27185392170280803
-47,<function shallow_lstm_linear_output at 0x00000148A47F5C60>,0.001,0.2919539467634472
-48,<function shallow_lstm_linear_output at 0x00000148A47F5C60>,0.0005,0.2542422081318608
-49,<function shallow_lstm_linear_output at 0x00000148A47F5C60>,0.0001,0.2977474502995211
+,Model,Learning Rate,MSE,Num. Epochs
+0,seq_model,0.005,0.012016484,8
+1,seq_model,0.005,0.012345075,10
+2,seq_model,0.005,0.012398022,14
+3,seq_model,0.001,0.014681907,8
+4,seq_model,0.001,0.014457338,10
+5,seq_model,0.001,0.013963999,14
+6,seq_model,0.0001,0.125644242,8
+7,seq_model,0.0001,0.07912697,10
+8,seq_model,0.0001,0.024651631,14
+9,create_custom_model,0.005,0.012896105,8
+10,create_custom_model,0.005,0.013882115,10
+11,create_custom_model,0.005,0.013314981,14
+12,create_custom_model,0.001,0.014570422,8
+13,create_custom_model,0.001,0.014324061,10
+14,create_custom_model,0.001,0.014120993,14
+15,create_custom_model,0.0001,0.021113251,8
+16,create_custom_model,0.0001,0.018343752,10
+17,create_custom_model,0.0001,0.017672048,14
+18,single_lstm_dense_output,0.005,0.012358618,8
+19,single_lstm_dense_output,0.005,0.012537801,10
+20,single_lstm_dense_output,0.005,0.012591946,14
+21,single_lstm_dense_output,0.001,0.013799669,8
+22,single_lstm_dense_output,0.001,0.014028037,10
+23,single_lstm_dense_output,0.001,0.01403602,14
+24,single_lstm_dense_output,0.0001,0.078217736,8
+25,single_lstm_dense_output,0.0001,0.063785416,10
+26,single_lstm_dense_output,0.0001,0.030135157,14
+27,two_layer_lstm,0.005,0.013525713,8
+28,two_layer_lstm,0.005,0.012574783,10
+29,two_layer_lstm,0.005,0.012903682,14
+30,two_layer_lstm,0.001,0.014389215,8
+31,two_layer_lstm,0.001,0.014313175,10
+32,two_layer_lstm,0.001,0.013805968,14
+33,two_layer_lstm,0.0001,0.025515149,8
+34,two_layer_lstm,0.0001,0.016925196,10
+35,two_layer_lstm,0.0001,0.017261049,14
+36,lstm_with_dropout,0.005,0.013072971,8
+37,lstm_with_dropout,0.005,0.013409412,10
+38,lstm_with_dropout,0.005,0.013175473,14
+39,lstm_with_dropout,0.001,0.013746649,8
+40,lstm_with_dropout,0.001,0.014364888,10
+41,lstm_with_dropout,0.001,0.014029455,14
+42,lstm_with_dropout,0.0001,0.030069533,8
+43,lstm_with_dropout,0.0001,0.019186441,10
+44,lstm_with_dropout,0.0001,0.018438777,14
+45,bidirectional_lstm,0.005,0.012782232,8
+46,bidirectional_lstm,0.005,0.01281015,10
+47,bidirectional_lstm,0.005,0.012681963,14
+48,bidirectional_lstm,0.001,0.013357209,8
+49,bidirectional_lstm,0.001,0.013467765,10
+50,bidirectional_lstm,0.001,0.013160276,14
+51,bidirectional_lstm,0.0001,0.020527414,8
+52,bidirectional_lstm,0.0001,0.017148233,10
+53,bidirectional_lstm,0.0001,0.015869694,14
+54,lstm_with_recurrent_dropout,0.005,0.012292057,8
+55,lstm_with_recurrent_dropout,0.005,0.012327334,10
+56,lstm_with_recurrent_dropout,0.005,0.012177726,14
+57,lstm_with_recurrent_dropout,0.001,0.01456461,8
+58,lstm_with_recurrent_dropout,0.001,0.014452505,10
+59,lstm_with_recurrent_dropout,0.001,0.013982253,14
+60,lstm_with_recurrent_dropout,0.0001,0.026357615,8
+61,lstm_with_recurrent_dropout,0.0001,0.021192315,10
+62,lstm_with_recurrent_dropout,0.0001,0.018319127,14
+63,deep_lstm_with_dense_layers,0.005,0.014593893,8
+64,deep_lstm_with_dense_layers,0.005,0.0130851,10
+65,deep_lstm_with_dense_layers,0.005,0.01281431,14
+66,deep_lstm_with_dense_layers,0.001,0.014437493,8
+67,deep_lstm_with_dense_layers,0.001,0.013926223,10
+68,deep_lstm_with_dense_layers,0.001,0.013208991,14
+69,deep_lstm_with_dense_layers,0.0001,0.035221205,8
+70,deep_lstm_with_dense_layers,0.0001,0.029589055,10
+71,deep_lstm_with_dense_layers,0.0001,0.016287797,14
+72,cnn_lstm_hybrid,0.005,0.014390532,8
+73,cnn_lstm_hybrid,0.005,0.014350034,10
+74,cnn_lstm_hybrid,0.005,0.013762729,14
+75,cnn_lstm_hybrid,0.001,0.016574639,8
+76,cnn_lstm_hybrid,0.001,0.016495546,10
+77,cnn_lstm_hybrid,0.001,0.014639721,14
+78,cnn_lstm_hybrid,0.0001,0.042551471,8
+79,cnn_lstm_hybrid,0.0001,0.019215283,10
+80,cnn_lstm_hybrid,0.0001,0.020641194,14
+81,shallow_lstm_linear_output,0.005,0.012826526,8
+82,shallow_lstm_linear_output,0.005,0.01165705,10
+83,shallow_lstm_linear_output,0.005,0.012243816,14
+84,shallow_lstm_linear_output,0.001,0.014986382,8
+85,shallow_lstm_linear_output,0.001,0.014492875,10
+86,shallow_lstm_linear_output,0.001,0.014334032,14
+87,shallow_lstm_linear_output,0.0001,0.071023261,8
+88,shallow_lstm_linear_output,0.0001,0.05612725,10
+89,shallow_lstm_linear_output,0.0001,0.025267449,14
+90,two_layer_bidirectional_lstm,0.005,0.014402313,8
+91,two_layer_bidirectional_lstm,0.005,0.01234565,10
+92,two_layer_bidirectional_lstm,0.005,0.015026121,14
+93,two_layer_bidirectional_lstm,0.001,0.013153966,8
+94,two_layer_bidirectional_lstm,0.001,0.012685153,10
+95,two_layer_bidirectional_lstm,0.001,0.013205395,14
+96,two_layer_bidirectional_lstm,0.0001,0.016928615,8
+97,two_layer_bidirectional_lstm,0.0001,0.016247784,10
+98,two_layer_bidirectional_lstm,0.0001,0.015725955,14
+99,deep_bidirectional_lstm_with_dropout,0.005,0.013600136,8
+100,deep_bidirectional_lstm_with_dropout,0.005,0.012680756,10
+101,deep_bidirectional_lstm_with_dropout,0.005,0.012594911,14
+102,deep_bidirectional_lstm_with_dropout,0.001,0.01297351,8
+103,deep_bidirectional_lstm_with_dropout,0.001,0.01257424,10
+104,deep_bidirectional_lstm_with_dropout,0.001,0.01283806,14
+105,deep_bidirectional_lstm_with_dropout,0.0001,0.016649905,8
+106,deep_bidirectional_lstm_with_dropout,0.0001,0.015615456,10
+107,deep_bidirectional_lstm_with_dropout,0.0001,0.014201131,14
+108,bidirectional_lstm_with_dense_layers,0.005,0.013265949,8
+109,bidirectional_lstm_with_dense_layers,0.005,0.013309569,10
+110,bidirectional_lstm_with_dense_layers,0.005,0.013508142,14
+111,bidirectional_lstm_with_dense_layers,0.001,0.013602593,8
+112,bidirectional_lstm_with_dense_layers,0.001,0.013197067,10
+113,bidirectional_lstm_with_dense_layers,0.001,0.013128862,14
+114,bidirectional_lstm_with_dense_layers,0.0001,0.016404868,8
+115,bidirectional_lstm_with_dense_layers,0.0001,0.015451871,10
+116,bidirectional_lstm_with_dense_layers,0.0001,0.014533666,14
+117,cnn_bidirectional_lstm_hybrid,0.005,0.014410347,8
+118,cnn_bidirectional_lstm_hybrid,0.005,0.013835964,10
+119,cnn_bidirectional_lstm_hybrid,0.005,0.013117591,14
+120,cnn_bidirectional_lstm_hybrid,0.001,0.015730358,8
+121,cnn_bidirectional_lstm_hybrid,0.001,0.015282454,10
+122,cnn_bidirectional_lstm_hybrid,0.001,0.014404214,14
+123,cnn_bidirectional_lstm_hybrid,0.0001,0.016992096,8
+124,cnn_bidirectional_lstm_hybrid,0.0001,0.017696929,10
+125,cnn_bidirectional_lstm_hybrid,0.0001,0.017066253,14
+126,very_deep_bidirectional_lstm,0.005,0.012296127,8
+127,very_deep_bidirectional_lstm,0.005,0.012459411,10
+128,very_deep_bidirectional_lstm,0.005,0.012086464,14
+129,very_deep_bidirectional_lstm,0.001,0.012669296,8
+130,very_deep_bidirectional_lstm,0.001,0.01272315,10
+131,very_deep_bidirectional_lstm,0.001,0.012964261,14
+132,very_deep_bidirectional_lstm,0.0001,0.014791898,8
+133,very_deep_bidirectional_lstm,0.0001,0.014494185,10
+134,very_deep_bidirectional_lstm,0.0001,0.013756304,14
+135,bidirectional_lstm_with_batch_norm,0.005,0.023268492,8
+136,bidirectional_lstm_with_batch_norm,0.005,0.016152696,10
+137,bidirectional_lstm_with_batch_norm,0.005,0.019238502,14
+138,bidirectional_lstm_with_batch_norm,0.001,0.176107389,8
+139,bidirectional_lstm_with_batch_norm,0.001,0.150863673,10
+140,bidirectional_lstm_with_batch_norm,0.001,0.119500525,14
+141,bidirectional_lstm_with_batch_norm,0.0001,0.19860009,8
+142,bidirectional_lstm_with_batch_norm,0.0001,0.128985589,10
+143,bidirectional_lstm_with_batch_norm,0.0001,0.153542456,14
