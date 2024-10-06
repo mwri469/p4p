@@ -11,6 +11,11 @@ from sklearn.metrics import mean_squared_error
 import tensorflow as tf
 import sys
 
+# Set seed for reproducability
+keras.utils.set_random_seed(42)
+np.random.seed(42)
+tf.random.set_seed(42)
+
 class Predictor:
     def __init__(self, dataframe: pd.DataFrame, feature_columns: list, target_columns: list,
                  using_options=False, options=None):
@@ -54,7 +59,7 @@ class Predictor:
         self.train_dataset, self.test_dataset = {}, {}
         for tgt in self.target_columns:
             X_train = np.asarray(self.X[tgt][:self.train_split[tgt]]).astype('float64')
-            X_val = np.asarray(self.X[tgt][self.train_split[tgt]:]).astype('float64')
+            X_val = np.asarray(self.X[tgt][self.train_split[tgt]:]).astype('float64')  
             y_train = np.asarray(self.y[tgt][:self.train_split[tgt]]).astype('float64')
             y_val = np.asarray(self.y[tgt][self.train_split[tgt]:]).astype('float64')
 
@@ -132,7 +137,7 @@ class Predictor:
             if self.in_jupyter: vbs = 1
             else: vbs = 0
             modelckpt_callback = keras.callbacks.ModelCheckpoint(
-                f'{tgt}_model_checkpoint.weights.h5',
+                f'./model_weights/{tgt.replace("/", "")}_model_checkpoint.weights.h5',
                 monitor='val_loss',
                 save_weights_only=True,
                 save_best_only=True
@@ -271,11 +276,12 @@ class DataProcessor:
         self.base_options = {
         'show_plots': False,
         'past': 7,
-        'future': 5,
+        'future': 3,
         'split_fraction':0.715,
         'model': self.seq_model,
         'learning rate': 0.001,
-        'in_jupyter': False
+        'in_jupyter': False,
+        'Num epochs': 10
     }
         
     def seq_model(self, s_past, s_future, shape):

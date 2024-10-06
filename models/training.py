@@ -23,6 +23,7 @@ FEATURES = [
 TARGETS = ['Rain(mm)', 'GustSpd(m/s)', 'Pstn(hPa)', 'Rad(MJ/m2)']  # Predict multiple features
 
 global drop_rate
+drop_rate= 0.3
 
 def very_deep_bidirectional_lstm(past, future, input_shape):
     """ Very deep Bidirectional LSTM model with four layers and dropout. """
@@ -51,7 +52,7 @@ def eval_over_time(df, num_months):
     df['Day(Local_Date)'] = pd.to_datetime(df['Day(Local_Date)'], format='%Y%m%d:%H%M')
     
     start_train = df['Day(Local_Date)'].min()
-    start_val = df['Day(Local_Date)'].max() - pd.DateOffset(months=3)
+    start_val = df['Day(Local_Date)'].max() - pd.DateOffset(months=11)
 
     validation_data = df.loc[(df['Day(Local_Date)'].dt.year >= start_val.year) &
                             (df['Day(Local_Date)'].dt.month >= start_val.month)]
@@ -182,11 +183,12 @@ def grid_search():
     # Define different model architectures and learning rates for grid search
     models = [
         # dp.seq_model,  # Default model
+        # deep_bidirectional_lstm_with_dropout,
         # create_custom_model,  # More complex architecture
         # bidirectional_lstm_with_attention,
         # bidirectional_lstm_with_residual_connections,
         # bidirectional_lstm_with_gru,
-        # single_lstm_dense_output,
+        single_lstm_dense_output,
         # two_layer_lstm,
         # lstm_with_dropout,
         # bidirectional_lstm,
@@ -195,43 +197,48 @@ def grid_search():
         # cnn_lstm_hybrid,
         shallow_lstm_linear_output,
         # two_layer_bidirectional_lstm,
-        # deep_bidirectional_lstm_with_dropout,
+        
         # bidirectional_lstm_with_recurrent_dropout,
         bidirectional_lstm_with_dense_layers,
-        cnn_bidirectional_lstm_hybrid,
+        # cnn_bidirectional_lstm_hybrid,
         very_deep_bidirectional_lstm,
         # bidirectional_lstm_with_batch_norm
         ]   
 
-    learning_rates = [0.01, 0.005, 0.001]
-    epochs = [8, 10, 14]
+    learning_rates = [0.01, 0.005]
+    epochs = [14, 20]
+    pasts = [2, 3, 5, 7, 10]
 
     df = pd.read_csv('./data/leigh2010_010924.csv')
 
     dp.optional__init__(df)
     dp.dt_col()
-    test, val = dp.test_val_split(num_months=9)
+    test, val = dp.test_val_split(num_months=11)
 
-    results = {'Model': [], 'Learning Rate': [], 'MSE': [], 'Num. Epochs': []}
+    results = {'Model': [], 'Learning Rate': [], 'Num. Epochs': [], 'Past': [], 'MSE': []}
+    
+    for p in pasts:
+        for md in models:
+            for lr in learning_rates:
+                for ep in epochs:
+                    print(f'Testing model {md.__name__} on learning rate {lr} . . .')
+                    dp.base_options['model'] = md
+                    dp.base_options['learning rate'] = lr
+                    dp.base_options['past'] = p
+                    dp.base_options['Num epochs'] = ep
 
-    for md in models:
-        for lr in learning_rates:
-            for ep in epochs:
-                print(f'Testing model {md.__name__} on learning rate {lr} . . .')
-                dp.base_options['model'] = md
-                dp.base_options['learning rate'] = lr
-
-                predictor = Predictor(dataframe=test, feature_columns=FEATURES, target_columns=TARGETS,
-                                    using_options=True, options=dp.base_options)
-                
-                predictor.train(epochs=ep)
-                
-                results['Learning Rate'].append(lr)
-                results['Model'].append(md.__name__)
-                results['Num. Epochs'].append(ep)
-                results['MSE'].append(np.mean(list(
-                    predictor.validate(val).values()
-                    )))
+                    predictor = Predictor(dataframe=test, feature_columns=FEATURES, target_columns=TARGETS,
+                                        using_options=True, options=dp.base_options)
+                    
+                    predictor.train(epochs=dp.base_options['Num epochs'])
+                    
+                    results['Learning Rate'].append(lr)
+                    results['Model'].append(md.__name__)
+                    results['Num. Epochs'].append(ep)
+                    results['Past'].append(p)
+                    results['MSE'].append(np.mean(list(
+                        predictor.validate(val).values()
+                        )))
             
     newdf = pd.DataFrame(results)
     newdf.to_csv('./data/new_grid_search.csv')
@@ -246,10 +253,17 @@ def main0():
 
     # Run hyperparameter gridsearch
     options = {
-        
+        'show_plots': False,
+        'past': 7,
+        'future': 5,
+        'split_fraction':0.715,
+        'model': shallow_lstm_linear_output,
+        'learning rate': 0.005,
+        'in_jupyter': False,
+        'Num epochs': 10
     }
 
-    eval_locs_on_comp(f1, f2)
+    eval_locs_on_comp(f1, f2, options)
 
 
 def main1():
